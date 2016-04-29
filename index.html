@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<title>手机拖拽轮播</title>
+</head>
+<style>
+body,ul,li{
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.box{
+	width: 100%;
+	height: 440px;
+	overflow: hidden;
+}
+.inner{
+	width: 500%;
+	height: 100%;
+}
+.inner li{
+	width: 20%;
+	height: 100%;
+	float: left;
+	line-height: 440px;
+	text-align: center;
+	font-size: 100px;
+	color: #fff;
+}
+.inner li:first-child{
+	background: #DD4E42;
+}
+.inner li:nth-child(2){
+	background: #FFCE44;
+}
+.inner li:nth-child(3){
+	background: #4C8BF5;
+}
+.inner li:nth-child(4){
+	background: #17A05E;
+}
+.inner li:nth-child(5){
+	background: #89ED3A;
+}
+</style>
+<script>
+window.onload=function(){
+	var isTouch='ontouchstart' in window;
+	if(isTouch){
+		var mousedown='touchstart';
+		var mousemove='touchmove';
+		var mouseup='touchend';
+	}else{
+		var mousedown='mousedown';
+		var mousemove='mousemove';
+		var mouseup='mouseup';
+	}
+	var box=document.querySelector(".box");
+	var iw=box.offsetWidth;
+		// console.log(iw)
+	var inner=box.querySelector(".inner");
+	var lis=inner.querySelectorAll("li");
+	// console.log(lis)
+	var i=0;
+	var moveX=0;
+	var lenx;
+	inner.addEventListener(mousedown,function(e){
+		e.preventDefault();
+		var stime=e.timeStamp;
+		var e=isTouch?e.changedTouches[0]:e;
+		var dx=e.clientX;
+		var mx=0;
+		var dir;
+		inner.style.transition="none";
+		function moves(e){
+			var e=isTouch?e.changedTouches[0]:e;
+			mx=e.clientX;
+			lenx=mx-dx;
+			dir=lenx>0?"right":"left";
+			inner.style.transform="translateX("+(moveX+lenx)+"px)"
+		}
+		function ups(e){
+			var etime=e.timeStamp;
+			var e=isTouch?e.changedTouches[0]:e;
+			var let=etime-stime;
+			// console.log(let)
+			if(Math.abs(lenx)>iw/2||(let<300&&(Math.abs(lenx)>10))){
+				if(dir=="right"){
+					i--;
+				}else if(dir=="left"){
+					i++;
+				}
+				if(i<0){
+					i=0;
+				}
+				else if(i>lis.length-1){
+					i=lis.length-1;
+				}
+					moveX=-i*iw;
+				// console.log(moveX)
+				inner.style.transition="transform 1s";
+				inner.style.transform="translateX("+moveX+"px)"
+			}else{
+				moveX=-i*iw;
+				inner.style.transition="transform 1s";
+				inner.style.transform="translateX("+moveX+"px)";
+			}
+			document.removeEventListener(mousemove,moves);
+			document.removeEventListener(mouseup,ups);
+		}
+		document.addEventListener(mousemove,moves);
+		document.addEventListener(mouseup,ups);
+		
+	})
+}
+</script>
+<body>
+	<div class="box">
+		<ul class="inner">
+			<li>1</li>
+			<li>2</li>
+			<li>3</li>
+			<li>4</li>
+			<li>5</li>
+		</ul>
+	</div>
+</body>
+</html>
